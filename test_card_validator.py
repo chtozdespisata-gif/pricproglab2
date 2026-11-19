@@ -1,4 +1,4 @@
-import os
+﻿import os
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
@@ -13,11 +13,11 @@ class TestCardValidator(unittest.TestCase):
         self.assertTrue(CardValidator.is_valid_card("4532015112830366"))          # Visa 16
         self.assertTrue(CardValidator.is_valid_card("4532 0151 1283 0366"))       # Visa с пробелами
         self.assertTrue(CardValidator.is_valid_card("4532-0151-1283-0366"))       # Visa с дефисами
-        self.assertTrue(CardValidator.is_valid_card("4532015112835"))             # Visa 13 цифр
-        self.assertTrue(CardValidator.is_valid_card("5425 2334 3010 9906"))       # MasterCard 54xx
-        self.assertTrue(CardValidator.is_valid_card("2701 0000 0000 0007"))       # MasterCard 2701
+        self.assertTrue(CardValidator.is_valid_card("4532015112830"))             # Visa 13 цифр
+        self.assertTrue(CardValidator.is_valid_card("5425 2334 3010 9903"))       # MasterCard 54xx
+        self.assertTrue(CardValidator.is_valid_card("2701 0000 0000 0008"))       # MasterCard 2701
         self.assertTrue(CardValidator.is_valid_card("2720 0000 0000 0005"))       # MasterCard 2720
-        self.assertTrue(CardValidator.is_valid_card("2200 7001 2345 6787"))       # МИР
+        self.assertTrue(CardValidator.is_valid_card("2200 7001 2345 6781"))       # МИР
 
     # Проверка граничных значений диапазонов платежных систем
     def test_prefix_boundaries(self) -> None:
@@ -49,27 +49,27 @@ class TestCardValidator(unittest.TestCase):
     # Поиск в строке текста (с проверкой Луна и без нее)
     def test_find_in_text(self) -> None:
         text = (
-            "Основная карта: 4532-0151-1283-0366, запасная: 5425 2334 3010 9906. "
+            "Основная карта: 4532-0151-1283-0366, запасная: 5425 2334 3010 9903. "
             "Неверная сумма: 4532015112830367. Длинное число: 453201511283036612345."
         )
         self.assertEqual(
             CardValidator.find_in_text(text, use_luhn=True),
-            ["4532-0151-1283-0366", "5425 2334 3010 9906"],
+            ["4532-0151-1283-0366", "5425 2334 3010 9903"],
         )
         self.assertEqual(
             CardValidator.find_in_text(text, use_luhn=False),
-            ["4532-0151-1283-0366", "5425 2334 3010 9906", "4532015112830367"],
+            ["4532-0151-1283-0366", "5425 2334 3010 9903", "4532015112830367"],
         )
 
     # Поиск в файле
     def test_find_in_file(self) -> None:
         with tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8") as tmp:
-            tmp.write("Счет №1.\nКарта: 2200 7001 2345 6787.\n")
+            tmp.write("Счет №1.\nКарта: 2200 7001 2345 6781.\n")
             tmp_path = tmp.name
 
         try:
             found = CardValidator.find_in_file(tmp_path)
-            self.assertEqual(found, ["2200 7001 2345 6787"])
+            self.assertEqual(found, ["2200 7001 2345 6781"])
         finally:
             os.remove(tmp_path)
 
